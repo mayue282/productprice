@@ -70,7 +70,14 @@ export async function fetchText(url, headers = BROWSER_HEADERS, timeoutMs = 1200
       signal: controller.signal,
     });
     const text = await response.text();
-    return { ok: response.ok, status: response.status, text, blocked: isBlockedHtml(text) };
+    const retryAfter = response.headers.get('retry-after');
+    return {
+      ok: response.ok,
+      status: response.status,
+      text,
+      blocked: isBlockedHtml(text),
+      retryAfter: retryAfter ? Number(retryAfter) : null,
+    };
   } finally {
     clearTimeout(timer);
   }
